@@ -1,0 +1,185 @@
+"""
+Author: Hao Ma
+Last update: 2023-02-06
+Mail: oaham@xmu.edu.cn
+Usage: Calculating vibrational spectra of water based on CP2K trajectory.
+"""
+在X方向加电场:
+&GLOBAL
+ PROJECT cp2kX 
+ RUN_TYPE MD
+ PRINT_LEVEL LOW
+&END GLOBAL
+&FORCE_EVAL
+ &DFT
+  BASIS_SET_FILE_NAME BASIS_MOLOPT
+  POTENTIAL_FILE_NAME POTENTIAL
+  &MGRID
+   CUTOFF 280
+   REL_CUTOFF 40
+   NGRIDS 5
+  &END
+  &SCF
+   SCF_GUESS ATOMIC
+   MAX_SCF 200
+   &OT
+    MINIMIZER DIIS
+    PRECONDITIONER FULL_SINGLE_INVERSE
+   &END
+   &PRINT
+    &RESTART
+     &EACH
+      MD 0
+     &END
+    &END RESTART
+   &END PRINT
+  &END SCF
+  
+&PERIODIC_EFIELD
+      INTENSITY  5.0E-3
+      POLARISATION  1.0  0.0  0.0
+    &END PERIODIC_EFIELD
+
+   &PRINT
+      &VORONOI
+        OUTPUT_EMP
+         &EACH
+             MD 4
+          &END EACH
+         APPEND
+      &END
+    &END PRINT
+
+  &XC
+   &XC_FUNCTIONAL BLYP
+   &END
+   &XC_GRID
+    XC_DERIV NN10_SMOOTH
+    XC_SMOOTH_RHO NN10
+   &END
+   &VDW_POTENTIAL
+    DISPERSION_FUNCTIONAL PAIR_POTENTIAL
+    &PAIR_POTENTIAL
+      TYPE DFTD3
+      PARAMETER_FILE_NAME dftd3.dat
+      REFERENCE_FUNCTIONAL BLYP
+    &END PAIR_POTENTIAL
+   &END VDW_POTENTIAL
+  &END XC
+ &END DFT
+ &SUBSYS
+  &CELL
+   ABC 7.82 7.82 7.82
+  &END
+  &TOPOLOGY
+    COORD_FILE_NAME water.cif
+    COORD_FILE_FORMAT CIF 
+  &END TOPOLOGY 
+  &KIND H
+   BASIS_SET DZVP-MOLOPT-SR-GTH
+   POTENTIAL GTH-BLYP-q1
+  &END
+  &KIND O
+   BASIS_SET DZVP-MOLOPT-SR-GTH
+   POTENTIAL GTH-BLYP-q6
+  &END
+  &KIND C
+   BASIS_SET DZVP-MOLOPT-SR-GTH
+   POTENTIAL GTH-BLYP-q4
+  &END
+ &END
+&END
+
+&MOTION
+ &MD
+ ENSEMBLE NVT
+ STEPS 60000
+ TIMESTEP 0.5
+  &THERMOSTAT
+    TYPE NOSE
+    &NOSE
+     TIMECON 100 
+    &END
+  &END
+  TEMPERATURE 400
+ &END
+ &PRINT
+   &RESTART
+    &EACH
+     MD 1
+    &END
+   &END
+ &END
+&END
+
+Travis输入文件为properties.emp、properties_x.emp、properties_y.emp、properties_z.emp：
+
+! TRAVIS input file
+! Created with TRAVIS version compiled at May 21 2021 14:33:28
+! Source code version: May 21 2021
+! Input file written at Mon Mar 28 13:48:36 2022.
+properties.emp
+! Use the advanced mode until the analysis selection menu (y/n)? [no] 
+
+! Use these values (y) or enter different values (n)? [yes] 
+
+! Update cell geometry in every time step (i.e., NPT ensemble) (y) or use fixed cell (n)? [yes] 
+n
+! Create images of the structural formulas (y/n)? [no] 
+
+! Accept these molecules (y) or change something (n)? [yes] 
+
+! Which functions to compute (comma separated)?
+spec
+! Use the advanced mode for the main part (y/n)? [no] 
+
+! Use two-pass mode (y/n)? [yes] 
+
+! Is this a gathering run (y) or the analyzing run (n)? [no] 
+
+! Are the frames in a non-uniform pattern in blocks of three (y/n)? [no] 
+
+! Enter the physical time distance between successive trajectory frames in fs: [0.5] 
+2
+! In which trajectory frame to start processing the trajectory? [1] 
+
+! How many trajectory frames to read (from this position on)? [all] 
+
+! Use every n-th read trajectory frame for the analysis: [1] 
+
+! Spectra to compute for this observation (comma separated): 
+IR,Raman
+! Observe molecules of type H2O for this spectrum (y/n)? [yes] 
+
+! Which molecules of type H2O to observe (e.g. 1,5-7)? [all] 
+
+! Enter the correlation depth of the correlation functions (in trajectory frames): [1024] 
+
+! Calculate spectrum up to which wave number (cm^-1)? [5000.00 cm^-1] 
+
+! Correct frequency shift of the Verlet integrator (y/n)? [no] 
+
+! Calculate scattering cross section for which laser wave number (cm^-1)? [20000.0] 
+
+! Calculate scattering cross section for which temperature (K)? [350.0] 
+
+! Correct spectrum for a certain simulation temperature (y/n)? [yes] 
+
+! Enter the simulation temperature (K): [350.0] 
+
+! Add another observation (y/n)? [no] 
+
+! Use central finite differences (y) or one-sided differences (n) for polarizabilities? [no] 
+
+! Enter electric field strength that was used for field trajectories (in a.u.): [5.0E-3] 
+
+! Enter core charge for atom type H: [1.0] 
+
+! Enter core charge for atom type O: [6.0] 
+
+! Enter data file name for field X: 
+properties_x.emp
+! Enter data file name for field Y: 
+properties_y.emp
+! Enter data file name for field Z: 
+properties_z.emp
