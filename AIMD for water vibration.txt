@@ -2,6 +2,7 @@
 Author: Hao Ma
 Last update: 2023-02-06
 Mail: oaham@xmu.edu.cn
+Please refer: Physical Chemistry Chemical Physics 2015, 17 (5), 3207-3213 && The Journal of Chemical Physics 2020, 152 (16), 164105 for usage and better understanding.
 Usage: Calculating vibrational spectra of water based on CP2K trajectory.
 """
 在X方向加电场:
